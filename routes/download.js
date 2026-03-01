@@ -47,33 +47,38 @@ router.get('/:id/get', async (req, res) => {
       .eq('id', id)
       .single()
 
-    if (error || !file) return res.status(404).json({ error: 'File not found' })
+    if (error || !file) return res.status(404).send('File not found')
 
     if (new Date() > new Date(file.expires_at)) {
       await supabase.storage.from('teleport-files').remove([`files/${id}`])
       await supabase.from('files').delete().eq('id', id)
-      return res.status(410).json({ error: 'File expired' })
+      return res.status(410).send('File expired')
     }
 
-    // Generate signed URL
-    const { data: signed, error: signError } = await supabase.storage
+    // Download file buffer from Supabase
+    const { data: fileData, error: downloadError } = await supabase.storage
       .from('teleport-files')
-      .createSignedUrl(`files/${id}`, 900, {
-        download: file.original_name
-      })
+      .download(`files/${id}`)
 
-    if (signError) throw signError
+    if (downloadError) throw downloadError
+
+    // Convert blob to buffer
+    const buffer = Buffer.from(await fileData.arrayBuffer())
 
     // Update download count
     await supabase.from('files')
       .update({ downloads: file.downloads + 1 })
       .eq('id', id)
 
-    return res.redirect(signed.signedUrl)
+    // Stream file directly to user through your server
+    res.setHeader('Content-Disposition', `attachment; filename="${file.original_name}"`)
+    res.setHeader('Content-Type', file.mime_type || 'application/octet-stream')
+    res.setHeader('Content-Length', buffer.length)
+    return res.send(buffer)
 
   } catch (err) {
-    console.error('File download error:', err)
-    return res.status(500).json({ error: 'Download failed' })
+    console.error('Download error:', err)
+    return res.status(500).send('Download failed')
   }
 })
 
