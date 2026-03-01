@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Teleport — Download File</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#8c2bee",
+          "background-dark": "#191022",
+          "surface-dark": "#211c27",
+        },
+        fontFamily: { "display": ["Space Grotesk", "sans-serif"] },
+        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+        boxShadow: { "glow": "0 0 20px -5px rgba(140, 43, 238, 0.5)" }
+      },
+    },
+  }
+</script>
+</head>
+
+<body class="bg-background-dark text-slate-100 font-display min-h-screen flex flex-col antialiased selection:bg-primary selection:text-white">
+<div class="relative flex min-h-screen w-full flex-col overflow-hidden">
+
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-5 md:px-10 border-b border-primary/10 bg-background-dark/50 backdrop-blur-md sticky top-0 z-50">
+    <div class="flex items-center gap-3 text-white">
+      <div class="size-8 flex items-center justify-center rounded bg-primary/20 text-primary">
+        <span class="material-symbols-outlined" style="font-size: 20px;">bolt</span>
+      </div>
+      <h1 class="text-xl font-bold tracking-tight uppercase">テレポート</h1>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 relative">
+
+    <!-- Background glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="w-full max-w-md relative z-10">
+
+      <!-- File Card -->
+      <div class="bg-[#211c27] border border-white/10 rounded-xl overflow-hidden shadow-xl shadow-glow transition-all duration-300">
+
+        <!-- Card Top: Icon Area -->
+        <div class="aspect-[16/9] w-full bg-[#2a2433] flex items-center justify-center relative group">
+          <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#8c2bee 1px, transparent 1px); background-size: 20px 20px;"></div>
+          <div class="relative z-10 size-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-primary/20 shadow-lg group-hover:scale-105 transition-transform duration-300">
+            <span id="file-icon" class="material-symbols-outlined text-primary" style="font-size: 48px;">draft</span>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="p-6 md:p-8 flex flex-col gap-6">
+
+          <!-- File Info -->
+          <div class="text-center space-y-2">
+            <h2 id="file-name" class="text-2xl font-bold text-white leading-tight break-all">Loading...</h2>
+            <p id="file-size" class="text-[#ab9db9] font-medium tracking-wide">—</p>
+          </div>
+
+          <!-- Divider -->
+          <div class="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+
+          <!-- Expiry inside card -->
+          <div class="flex items-center justify-center gap-2 text-sm text-[#ab9db9]">
+            <span class="material-symbols-outlined text-base text-primary">timer</span>
+            <span id="expiry-label">Loading expiry...</span>
+          </div>
+
+          <!-- Download Button -->
+          <button id="download-btn"
+                  class="group w-full relative flex items-center justify-center gap-3 bg-primary hover:bg-primary/90 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 shadow-lg shadow-primary/25 hover:shadow-primary/40 focus:ring-4 focus:ring-primary/30 outline-none disabled:opacity-50 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined transition-transform duration-300 group-hover:-translate-y-0.5">download</span>
+            <span>Download File</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- Footer notice -->
+      <div class="mt-6 text-center">
+        <p class="text-slate-500 text-xs">End-to-end encrypted · Anonymous transfer · No account needed</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-6 text-center text-slate-600 text-xs">
+    <p>© 2025 テレポート · Files are automatically deleted</p>
+  </footer>
+
+</div>
+
+<script>
+  const fileId = window.location.pathname.split('/')[2]
+
+  const nameEl     = document.getElementById('file-name')
+  const sizeEl     = document.getElementById('file-size')
+  const expiryEl   = document.getElementById('expiry-label')
+  const iconEl     = document.getElementById('file-icon')
+  const downloadBtn = document.getElementById('download-btn')
+
+  // Fetch file metadata
+  fetch(`/info/${fileId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        nameEl.textContent   = data.error === 'Expired' ? 'This file has expired' : 'File not found'
+        sizeEl.textContent   = ''
+        expiryEl.textContent = 'This file no longer exists'
+        downloadBtn.disabled = true
+        return
+      }
+
+      // File name
+      nameEl.textContent = data.originalName
+
+      // File size
+      const bytes = data.sizeBytes
+      sizeEl.textContent = bytes > 1024 * 1024
+        ? (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+        : (bytes / 1024).toFixed(1) + ' KB'
+
+      // Expiry
+      const expires  = new Date(data.expiresAt)
+      const msLeft   = expires - Date.now()
+      const hoursLeft = Math.max(0, Math.round(msLeft / 36e5))
+      expiryEl.textContent = hoursLeft > 48
+        ? `Expires in ${Math.round(hoursLeft / 24)} days`
+        : hoursLeft === 0
+        ? 'Expiring very soon'
+        : `Expires in ${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''}`
+
+      // File icon based on mime type
+      if (data.mimeType) {
+        if (data.mimeType.startsWith('image/'))        iconEl.textContent = 'image'
+        else if (data.mimeType.startsWith('video/'))   iconEl.textContent = 'movie'
+        else if (data.mimeType.startsWith('audio/'))   iconEl.textContent = 'audio_file'
+        else if (data.mimeType === 'application/pdf')  iconEl.textContent = 'picture_as_pdf'
+        else if (data.mimeType.includes('zip'))        iconEl.textContent = 'folder_zip'
+        else if (data.mimeType.includes('word'))       iconEl.textContent = 'description'
+        else if (data.mimeType.includes('sheet') || data.mimeType.includes('excel')) iconEl.textContent = 'table'
+        else                                            iconEl.textContent = 'draft'
+      }
+    })
+    .catch(() => {
+      nameEl.textContent   = 'Could not load file'
+      expiryEl.textContent = 'Please try again'
+      downloadBtn.disabled = true
+    })
+
+  // Download button click
+  downloadBtn.addEventListener('click', () => {
+    window.location.href = `/d/${fileId}/get`
+  })
+</script>
+
+</body>
+</html>
