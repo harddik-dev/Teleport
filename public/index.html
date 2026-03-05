@@ -1,79 +1,82 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Teleport — Anonymous File Sharing</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script id="tailwind-config">
-  tailwind.config = {
-    darkMode: "class",
-    theme: {
-      extend: {
-        colors: {
-          "primary": "#8c2bee",
-          "primary-dark": "#7a22d6",
-          "background-dark": "#191022",
-          "surface-dark": "#251830",
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Teleport — Anonymous File Sharing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.8.3/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nsfwjs@2.4.1/dist/nsfwjs.min.js"></script>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#8c2bee",
+            "primary-dark": "#7a22d6",
+            "background-dark": "#191022",
+            "surface-dark": "#251830",
+          },
+          fontFamily: { "display": ["Space Grotesk", "sans-serif"] },
+          borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
         },
-        fontFamily: { "display": ["Space Grotesk", "sans-serif"] },
-        borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
       },
-    },
-  }
-</script>
-<style>
-  /* Animations */
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.85); }
-    to   { opacity: 1; transform: scale(1); }
-  }
-  @keyframes checkPop {
-    0%   { transform: scale(0); opacity: 0; }
-    60%  { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  @keyframes progressBar {
-    from { width: 0%; }
-    to   { width: 100%; }
-  }
-  .animate-fade-in-up  { animation: fadeInUp 0.5s ease both; }
-  .animate-scale-in    { animation: scaleIn 0.4s ease both; }
-  .animate-check-pop   { animation: checkPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
-  .stagger-1 { animation-delay: 0.05s; }
-  .stagger-2 { animation-delay: 0.12s; }
-  .stagger-3 { animation-delay: 0.20s; }
-  .stagger-4 { animation-delay: 0.28s; }
+    }
+  </script>
+  <style>
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes checkPop {
+      0%   { transform: scale(0); opacity: 0; }
+      60%  { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes progressBar {
+      from { width: 0%; }
+      to   { width: 100%; }
+    }
+    .animate-fade-in-up  { animation: fadeInUp 0.5s ease both; }
+    .animate-scale-in    { animation: scaleIn 0.4s ease both; }
+    .animate-check-pop   { animation: checkPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+    .stagger-1 { animation-delay: 0.05s; }
+    .stagger-2 { animation-delay: 0.12s; }
+    .stagger-3 { animation-delay: 0.20s; }
+    .stagger-4 { animation-delay: 0.28s; }
 
-  /* Upload zone drag-over state */
-  .upload-zone.drag-over {
-    border-color: #8c2bee !important;
-    background-color: rgba(140,43,238,0.08) !important;
-  }
+    /* Upload zone drag-over state */
+    .upload-zone.drag-over {
+      border-color: #8c2bee !important;
+      background-color: rgba(140,43,238,0.08) !important;
+    }
 
-  /* Progress bar animation */
-  .progress-fill { animation: progressBar 2s ease forwards; }
+    /* Progress bar animation */
+    .progress-fill { animation: progressBar 2s ease forwards; }
 
-  /* Copied feedback */
-  .copied-flash { animation: fadeInUp 0.2s ease both; }
+    /* Copied feedback */
+    .copied-flash { animation: fadeInUp 0.2s ease both; }
 
-  /* Hide/show views */
-  #upload-view  { display: flex; }
-  #success-view { display: none; }
-  #loading-view { display: none; }
-</style>
+    /* Hide/show views */
+    #upload-view  { display: flex; }
+    #success-view { display: none; }
+    #loading-view { display: none; }
+  </style>
 </head>
 
 <body class="bg-background-dark font-display min-h-screen flex flex-col text-slate-100 selection:bg-primary/30 overflow-x-hidden">
 
-<!-- ── HEADER ── -->
 <header class="flex items-center justify-between whitespace-nowrap border-b border-white/5 px-8 py-4 bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
   <div class="flex items-center gap-3">
     <div class="flex items-center justify-center size-8 rounded-full bg-primary/20 text-primary">
@@ -84,19 +87,14 @@
   <span class="text-xs text-zinc-500 hidden sm:block">No account · No tracking · Auto-deletes</span>
 </header>
 
-<!-- ── BACKGROUND GLOW ── -->
 <div class="fixed inset-0 pointer-events-none z-0">
   <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-primary/10 rounded-full blur-[140px]"></div>
   <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-[120px]"></div>
 </div>
 
-<!-- ════════════════════════════════════════
-     VIEW 1 — UPLOAD
-════════════════════════════════════════ -->
 <main id="upload-view" class="flex-1 flex-col items-center justify-center px-4 py-12 relative z-10">
   <div class="w-full max-w-[600px] mx-auto flex flex-col gap-8">
 
-    <!-- Title -->
     <div class="text-center space-y-2 animate-fade-in-up">
       <h1 class="text-4xl md:text-5xl font-bold tracking-tighter bg-gradient-to-r from-white to-white/50 bg-clip-text text-transparent">
         Share files instantly
@@ -104,7 +102,6 @@
       <p class="text-zinc-400 text-lg">Secure, anonymous, and ephemeral.</p>
     </div>
 
-    <!-- Drop Zone -->
     <div id="drop-zone"
          class="upload-zone group relative flex flex-col items-center gap-5 rounded-2xl border-2 border-dashed border-white/10 bg-white/5 px-6 py-20 transition-all hover:border-primary/50 hover:bg-primary/5 cursor-pointer animate-fade-in-up stagger-1">
       <div class="flex items-center justify-center size-20 rounded-full bg-white/5 group-hover:bg-primary/20 transition-colors">
@@ -117,7 +114,6 @@
       <input id="file-input" class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
     </div>
 
-    <!-- TTL Selector -->
     <div class="flex flex-col items-center gap-3 animate-fade-in-up stagger-2">
       <span class="text-xs font-semibold text-zinc-500 uppercase tracking-widest">Auto-delete after</span>
       <div class="flex gap-2 p-1 rounded-full bg-white/5 border border-white/5">
@@ -127,7 +123,6 @@
       </div>
     </div>
 
-    <!-- Teleport Button -->
     <div class="flex flex-col items-center gap-3 animate-fade-in-up stagger-3">
       <button id="teleport-btn"
               class="relative w-full max-w-[320px] h-14 flex items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#8c2bee] to-[#6d21bd] shadow-[0_0_30px_rgba(140,43,238,0.3)] hover:shadow-[0_0_50px_rgba(140,43,238,0.5)] transition-all duration-300 hover:brightness-110 font-bold text-lg text-white disabled:opacity-40 disabled:cursor-not-allowed">
@@ -141,34 +136,26 @@
 </main>
 
 
-<!-- ════════════════════════════════════════
-     VIEW 2 — LOADING
-════════════════════════════════════════ -->
 <main id="loading-view" class="flex-1 flex-col items-center justify-center px-4 py-12 relative z-10">
   <div class="w-full max-w-[480px] mx-auto flex flex-col items-center gap-8 text-center">
     <div class="size-20 rounded-full bg-primary/20 flex items-center justify-center">
       <span class="material-symbols-outlined text-primary text-4xl animate-spin">sync</span>
     </div>
     <div>
-      <h2 class="text-2xl font-bold">Teleporting your file…</h2>
+      <h2 class="text-2xl font-bold" id="loading-title">Teleporting your file…</h2>
       <p class="text-zinc-400 mt-1 text-sm" id="loading-filename"></p>
     </div>
-    <!-- Progress Bar -->
     <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
       <div id="progress-fill" class="h-full bg-gradient-to-r from-primary to-purple-400 rounded-full" style="width:0%"></div>
     </div>
-    <p class="text-zinc-500 text-sm">Encrypting &amp; uploading securely…</p>
+    <p class="text-zinc-500 text-sm" id="loading-status">Encrypting &amp; uploading securely…</p>
   </div>
 </main>
 
 
-<!-- ════════════════════════════════════════
-     VIEW 3 — SUCCESS
-════════════════════════════════════════ -->
 <main id="success-view" class="flex-1 flex-col items-center justify-center px-4 py-12 relative z-10">
   <div class="w-full max-w-[600px] mx-auto flex flex-col items-center gap-8">
 
-    <!-- Check + Title -->
     <div class="flex flex-col items-center gap-4 text-center animate-fade-in-up">
       <div class="size-20 rounded-full bg-primary flex items-center justify-center shadow-[0_0_40px_-5px_rgba(140,43,238,0.6)] animate-check-pop">
         <span class="material-symbols-outlined text-white text-5xl">check</span>
@@ -177,7 +164,6 @@
       <p class="text-zinc-400">Anyone with the link can download this file.</p>
     </div>
 
-    <!-- URL Copy Box -->
     <div class="w-full animate-fade-in-up stagger-1">
       <div class="bg-surface-dark border border-white/5 rounded-2xl p-2 pl-5 flex items-center shadow-lg shadow-primary/5 hover:shadow-primary/10 transition-shadow">
         <span class="material-symbols-outlined text-zinc-500 mr-3 shrink-0">link</span>
@@ -190,7 +176,6 @@
       </div>
     </div>
 
-    <!-- QR Code -->
     <div class="bg-white rounded-2xl p-5 shadow-xl flex flex-col items-center gap-3 animate-fade-in-up stagger-2">
       <div id="qr-code" class="w-48 h-48"></div>
       <p class="text-slate-800 text-sm font-bold flex items-center gap-2">
@@ -199,7 +184,6 @@
       </p>
     </div>
 
-    <!-- File Info -->
     <div class="flex flex-wrap justify-center gap-3 text-sm font-medium text-zinc-400 bg-white/5 px-4 py-2 rounded-lg border border-white/5 animate-fade-in-up stagger-3">
       <span class="flex items-center gap-1.5">
         <span class="material-symbols-outlined text-base">description</span>
@@ -214,7 +198,6 @@
       </span>
     </div>
 
-    <!-- Reset Button -->
     <button onclick="resetToUpload()"
             class="group flex items-center gap-2 text-zinc-400 hover:text-primary transition-colors text-sm font-bold animate-fade-in-up stagger-4">
       <span class="material-symbols-outlined group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform">refresh</span>
@@ -224,81 +207,139 @@
   </div>
 </main>
 
-<!-- ── FOOTER ── -->
 <footer class="relative z-10 py-6 text-center text-xs text-zinc-700">
   <p>© 2025 Teleport · Files are automatically deleted · No data stored</p>
 </footer>
 
-
 <script>
-// ── State ──────────────────────────────────────────────────────────────
-let selectedTTL = 24;
-let selectedFile = null;
+  // ── State ──────────────────────────────────────────────────────────────
+  let selectedTTL = 24;
+  let selectedFile = null;
 
-// ── TTL Buttons ────────────────────────────────────────────────────────
-document.querySelectorAll('.ttl-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.ttl-btn').forEach(b => {
-      b.classList.remove('active', 'bg-primary', 'text-white', 'shadow-[0_0_15px_rgba(140,43,238,0.5)]');
-      b.classList.add('text-zinc-400');
-    });
-    btn.classList.add('active', 'bg-primary', 'text-white', 'shadow-[0_0_15px_rgba(140,43,238,0.5)]');
-    btn.classList.remove('text-zinc-400');
-    selectedTTL = parseInt(btn.dataset.ttl);
-  });
-});
-
-// ── File Input ─────────────────────────────────────────────────────────
-const fileInput = document.getElementById('file-input');
-const dropZone  = document.getElementById('drop-zone');
-
-fileInput.addEventListener('change', e => {
-  if (e.target.files[0]) selectFile(e.target.files[0]);
-});
-
-// Drag and Drop
-dropZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  dropZone.classList.add('drag-over');
-});
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]);
-});
-
-function selectFile(file) {
-  selectedFile = file;
-  document.getElementById('drop-label').textContent = file.name;
-  document.getElementById('drop-sub').textContent = formatBytes(file.size) + ' — click to change';
-}
-
-// ── Teleport Button ────────────────────────────────────────────────────
-document.getElementById('teleport-btn').addEventListener('click', () => {
-  if (!selectedFile) {
-    fileInput.click(); // prompt to pick file if none selected
-    return;
+  // ── AI INITIALIZATION ──────────────────────────────────────────────────
+  let nsfwModel = null;
+  async function loadAIModel() {
+    console.log("Initializing Client-Side Content Moderation...");
+    try {
+      nsfwModel = await nsfwjs.load('/models/mobilenet_v2/');
+      console.log("AI Model Active. Client-side protection enabled.");
+    } catch (error) {
+      console.error("Failed to load AI model:", error);
+    }
   }
-  startUpload();
-});
+  loadAIModel(); // Execute immediately
 
-function startUpload() {
-  showView('loading');
-  document.getElementById('loading-filename').textContent = selectedFile.name;
+  // ── TTL Buttons ────────────────────────────────────────────────────────
+  document.querySelectorAll('.ttl-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ttl-btn').forEach(b => {
+        b.classList.remove('active', 'bg-primary', 'text-white', 'shadow-[0_0_15px_rgba(140,43,238,0.5)]');
+        b.classList.add('text-zinc-400');
+      });
+      btn.classList.add('active', 'bg-primary', 'text-white', 'shadow-[0_0_15px_rgba(140,43,238,0.5)]');
+      btn.classList.remove('text-zinc-400');
+      selectedTTL = parseInt(btn.dataset.ttl);
+    });
+  });
 
-  // Animate progress bar
-  const fill = document.getElementById('progress-fill');
-  fill.style.width = '0%';
-  let prog = 0;
-  const interval = setInterval(() => {
-    prog += Math.random() * 18;
-    if (prog >= 95) { prog = 95; clearInterval(interval); }
-    fill.style.width = prog + '%';
-  }, 200);
+  // ── File Input ─────────────────────────────────────────────────────────
+  const fileInput = document.getElementById('file-input');
+  const dropZone  = document.getElementById('drop-zone');
 
-  // ── Real upload to Express backend ──
-  (async () => {
+  fileInput.addEventListener('change', e => {
+    if (e.target.files[0]) selectFile(e.target.files[0]);
+  });
+
+  // Drag and Drop
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+  });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]);
+  });
+
+  function selectFile(file) {
+    selectedFile = file;
+    document.getElementById('drop-label').textContent = file.name;
+    document.getElementById('drop-sub').textContent = formatBytes(file.size) + ' — click to change';
+  }
+
+  // ── Teleport Button ────────────────────────────────────────────────────
+  document.getElementById('teleport-btn').addEventListener('click', () => {
+    if (!selectedFile) {
+      fileInput.click();
+      return;
+    }
+    startUpload();
+  });
+
+  async function startUpload() {
+    showView('loading');
+    document.getElementById('loading-filename').textContent = selectedFile.name;
+    const statusText = document.getElementById('loading-status');
+    const titleText = document.getElementById('loading-title');
+
+    // ── AI INTERCEPTION PROTOCOL ─────────────────────────────────────────
+    if (selectedFile.type.startsWith('image/')) {
+      if (!nsfwModel) {
+        alert("Security framework initializing. Please wait a moment.");
+        showView('upload');
+        return;
+      }
+
+      titleText.textContent = "Analyzing Content…";
+      statusText.textContent = "AI verifying image policy compliance...";
+
+      try {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(selectedFile);
+        img.src = objectUrl;
+
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+
+        const predictions = await nsfwModel.classify(img);
+        URL.revokeObjectURL(objectUrl);
+
+        // Diagnostic output: Observe the AI's exact confidence scores in your console
+        console.table(predictions);
+
+        // Stricter policy: Include 'Sexy' and drop the threshold to 40% (0.40)
+        const isUnsafe = predictions.some(p =>
+                (p.className === 'Porn' || p.className === 'Hentai' || p.className === 'Sexy') && p.probability > 0.40
+        );
+
+        if (isUnsafe) {
+          alert("Transmission Aborted: Content violates safety policies.");
+          resetToUpload();
+          return; // Halt immediately.
+        }
+      } catch (err) {
+        console.error("AI Analysis skipped due to error:", err);
+      }
+    }
+
+    // ── STANDARD UPLOAD PROTOCOL ─────────────────────────────────────────
+    titleText.textContent = "Teleporting your file…";
+    statusText.textContent = "Encrypting & uploading securely...";
+
+    // Animate progress bar
+    const fill = document.getElementById('progress-fill');
+    fill.style.width = '0%';
+    let prog = 0;
+    const interval = setInterval(() => {
+      prog += Math.random() * 18;
+      if (prog >= 95) { prog = 95; clearInterval(interval); }
+      fill.style.width = prog + '%';
+    }, 200);
+
+    // Real upload to Express backend
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
@@ -321,71 +362,57 @@ function startUpload() {
       alert('Something went wrong: ' + err.message);
       showView('upload');
     }
-  })();
-}
+  }
 
-// ── Success ────────────────────────────────────────────────────────────
-function showSuccess(url) {
-  // Populate URL
-  document.getElementById('share-url').value = url;
+  // ── Success ────────────────────────────────────────────────────────────
+  function showSuccess(url) {
+    document.getElementById('share-url').value = url;
+    document.getElementById('info-filename').textContent = selectedFile.name;
+    document.getElementById('info-size').textContent = formatBytes(selectedFile.size);
+    const expiryLabel = selectedTTL === 1 ? '1 hour' : selectedTTL === 24 ? '24 hours' : '7 days';
+    document.getElementById('info-expiry').textContent = `expires in ${expiryLabel}`;
 
-  // Populate file info
-  document.getElementById('info-filename').textContent = selectedFile.name;
-  document.getElementById('info-size').textContent = formatBytes(selectedFile.size);
-  const expiryLabel = selectedTTL === 1 ? '1 hour' : selectedTTL === 24 ? '24 hours' : '7 days';
-  document.getElementById('info-expiry').textContent = `expires in ${expiryLabel}`;
+    const qrContainer = document.getElementById('qr-code');
+    qrContainer.innerHTML = '';
+    new QRCode(qrContainer, {
+      text: url, width: 192, height: 192, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M
+    });
 
-  // Generate QR
-  const qrContainer = document.getElementById('qr-code');
-  qrContainer.innerHTML = '';
-  new QRCode(qrContainer, {
-    text: url,
-    width: 192,
-    height: 192,
-    colorDark: '#000000',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.M
-  });
+    showView('success');
+  }
 
-  showView('success');
-}
+  // ── Copy URL ───────────────────────────────────────────────────────────
+  function copyURL() {
+    const url = document.getElementById('share-url').value;
+    navigator.clipboard.writeText(url).then(() => {
+      const label = document.getElementById('copy-label');
+      label.textContent = 'Copied!';
+      setTimeout(() => label.textContent = 'Copy', 2000);
+    });
+  }
 
-// ── Copy URL ───────────────────────────────────────────────────────────
-function copyURL() {
-  const url = document.getElementById('share-url').value;
-  navigator.clipboard.writeText(url).then(() => {
-    const label = document.getElementById('copy-label');
-    label.textContent = 'Copied!';
-    setTimeout(() => label.textContent = 'Copy', 2000);
-  });
-}
+  // ── Reset ──────────────────────────────────────────────────────────────
+  function resetToUpload() {
+    selectedFile = null;
+    fileInput.value = '';
+    document.getElementById('drop-label').textContent = 'Drop your file here';
+    document.getElementById('drop-sub').textContent = 'or click to browse • any file type';
+    showView('upload');
+  }
 
-// ── Reset ──────────────────────────────────────────────────────────────
-function resetToUpload() {
-  selectedFile = null;
-  fileInput.value = '';
-  document.getElementById('drop-label').textContent = 'Drop your file here';
-  document.getElementById('drop-sub').textContent = 'or click to browse • any file type';
-  showView('upload');
-}
+  // ── View switcher ──────────────────────────────────────────────────────
+  function showView(name) {
+    document.getElementById('upload-view').style.display  = name === 'upload'  ? 'flex' : 'none';
+    document.getElementById('loading-view').style.display = name === 'loading' ? 'flex' : 'none';
+    document.getElementById('success-view').style.display = name === 'success' ? 'flex' : 'none';
+  }
 
-// ── View switcher ──────────────────────────────────────────────────────
-function showView(name) {
-  document.getElementById('upload-view').style.display  = name === 'upload'  ? 'flex' : 'none';
-  document.getElementById('loading-view').style.display = name === 'loading' ? 'flex' : 'none';
-  document.getElementById('success-view').style.display = name === 'success' ? 'flex' : 'none';
-}
-
-// ── Helpers ────────────────────────────────────────────────────────────
-function formatBytes(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-}
-
-function randomId() {
-  return Math.random().toString(36).substring(2, 10);
-}
+  // ── Helpers ────────────────────────────────────────────────────────────
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
 </script>
 
 </body>
